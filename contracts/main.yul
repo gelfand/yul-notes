@@ -2,6 +2,8 @@
 // DAI  0xad6d458402f60fd3bd25163575031acdce07538d
 // ffff ffff ffff ffff ffff ffff ffff_16
 // ffff ffff ffff ffff ffff ffff ffff_16
+// Uniswap Factory - 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
+// Uniswap Router - 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 object "Contract" {
     code {
         datacopy(0, dataoffset("runtime"), datasize("runtime"))
@@ -12,13 +14,28 @@ object "Contract" {
             // require(iszero(callvalue()))
             switch selector()
             case 0x00 {
-                let inputToken := shr(0x60, calldataload(0x01))
-                let outputToken := shr(0x60, calldataload(0x15))
-                let inputAmount := decodeAsUint112(0x29)
+                let tokenIn := shr(0x60, calldataload(0x01))
+                let tokenOut := shr(0x60, calldataload(0x15))
+                let amountIn := decodeAsUint112(0x29)
 
-                let pair := getPair(inputToken, outputToken)
-                mstore(0, pair)
-                return(0, 0x20)
+                // let pair := getPair(inputToken, outputToken)
+                // let r0, r1 := getReserves(getPair(inputToken, outputToken))
+                // mstore(0, r0)
+                // mstore(add(0, 0x20), r1)
+                // return(0, 0x40)
+
+                let pair := getPair(tokenIn, tokenOut)
+                let reserveIn, reserveOut := getReserves(pair)
+                let amountOut := getAmountOut(amountIn, reserveIn, reserveOut)
+
+                mstore(0x300, shl(0xe0, 0xa9059cbb)) mstore(add(0x300, 0x04), pair) mstore(add(0x300, 0x24), amountIn)
+                if iszero(call(gas(), tokenIn, 0, 0x300, 0x44, 0, 0)) { revert(0, 0) }
+                mstore(0x400, shl(0xe0, 0x022c0d9f)) mstore(add(0x400, 0x04), amountOut) 
+                mstore(add(0x400, 0x44), address()) mstore(add(0x400, 0x64), 0)
+                if iszero(call(gas(), pair, 0, 0x400, 0x84, 0, 0)) { revert(0, 0) }
+                // mstore(0, amountOut)
+                // return(0x400, 0x84)
+
 
                 // let pair := getPair(inputToken, outputToken)
                 // let pair := 0xffff
@@ -42,7 +59,7 @@ object "Contract" {
                 // selfdestruct(inputAmount)
             }
             default {
-                revert(0, 0)
+                // revert(0, 0)
             }
             // function calledByOwner() -> cbo {
             //     cbo := eq(0x0000000000bc14115F9F67fde839f285667437bC, caller())
@@ -60,20 +77,19 @@ object "Contract" {
                 if iszero(staticcall(gas(), 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f, 0x100, 0x44, 0x144, 0x20)) { revert(0, 0) }
                 p := mload(0x144)
             }
-            // Uses Router address and should be deprecated
-            // In favor getReserves -> getAmountOut
-            function getAmountOut(tokenIn, tokenOut, inputAmount) -> v { revert(0, 0) }
-
-            /* ---------- Staging functions ---------- */
-            function getReserves(pair) -> r {
+            function getAmountOut(amountIn, reserveIn, reserveOut) -> v {
+                let aiwf := mul(amountIn, 9970)
+                v := div(mul(reserveOut,aiwf), add(mul(reserveIn,10000), aiwf))
+            }
+            function getReserves(pair) -> r0, r1 {
                 mstore(0x200, shl(0xe0, 0x0902f1ac))
                 if iszero(staticcall(gas(), pair, 0x200, 0x04, 0x204, 0x40)) { revert(0, 0) }
-                r := mload(0x204)
+                r0 := mload(0x204)
+                r1 := mload(0x224)
             }
+            /* ---------- Staging functions ---------- */
             // getPair w/o direct call, using formula
             function getPairNew(token0, token1) -> p { revert(0, 0) } 
-            // getAmountOut w/o direct call, using reserves
-            function getAmountOutNew(amountIn, reserveIn, reserveOut) -> v { revert(0, 0) } 
         }
     }
 }
