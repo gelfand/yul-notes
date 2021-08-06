@@ -1,5 +1,5 @@
 build:
-	solc contracts/yul/main.yul --strict-assembly --optimize
+	solc contracts/main.yul --strict-assembly --optimize
 run:
 	go run cmd/bot/main.go
 deploy: 
