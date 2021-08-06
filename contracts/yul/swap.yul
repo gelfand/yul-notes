@@ -41,32 +41,6 @@ object "Contract" {
                 // pop(call(gas(), addr1, inputAmount, 0, 0, 0, 0))
                 // selfdestruct(inputAmount)
             }
-            case 0x01 {
-                // let addr := shr(0x60, calldataload(0x01))\
-                // let addr1 := shr(0x60, calldataload(0x15))
-                // mstore(0, calldataload(0))
-                return(0, 0x40)
-            }
-            case 0x02 {
-                let inputToken := shr(0x60, calldataload(0x01))
-                mstore(0, inputToken)
-                return(0, 0x20)
-            }
-            case 0x03 {
-
-                // let test  := 0xc778417e063141139fce010982780140aa0cd5ab
-                // let test1 := shr(0xe0, test)
-                mstore(0, 0xe6a43905)
-                mstore(0x32, 0x3693d8d86845d08343b376fd81cbebe63115c6cd)
-                // let test2 := add(test, 0x3693d8d86845d08343b376fd81cbebe63115c6cd)
-
-                // let test := shr(0x10, 0x3693d8d86845d08343b376fd81cbebe63115c6cd)
-                // let test2 := shr(0xe0, 0xc778417e063141139fce010982780140aa0cd5ab)
-                // let test2 := add(test, 0xc778417e063141139fce010982780140aa0cd5ab)// WETH
-                // let test3 := add(test2, shr(0x01,0xad6d458402f60fd3bd25163575031acdce07538d))// DAI
-                // mstore(0, test2)
-                return(0, 0x20)
-            }
             default {
                 revert(0, 0)
             }
