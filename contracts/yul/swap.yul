@@ -54,6 +54,7 @@ object "Contract" {
                 // 0x100-(dataSize-0x29)*8
                 v := shr(sub(0x100, mul(8, sub(calldatasize(), _pos))), calldataload(_pos))
             } 
+            // ↓ This sucks and should be deprecated
             function getPair(token0, token1) -> p {
                 mstore(0x100, shl(0xe0, 0xe6a43905)) mstore(add(0x100, 0x04), token0) mstore(add(0x100, 0x24), token1)
                 if iszero(staticcall(gas(), 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f, 0x100, 0x44, 0x144, 0x20)) { revert(0, 0) }
