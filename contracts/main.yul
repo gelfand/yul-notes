@@ -1,9 +1,3 @@
-// WETH 0xc778417e063141139fce010982780140aa0cd5ab
-// DAI  0xad6d458402f60fd3bd25163575031acdce07538d
-// ffff ffff ffff ffff ffff ffff ffff_16
-// ffff ffff ffff ffff ffff ffff ffff_16
-// Uniswap Factory - 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
-// Uniswap Router - 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 object "Contract" {
     code {
         datacopy(0, dataoffset("runtime"), datasize("runtime"))
@@ -43,10 +37,7 @@ object "Contract" {
                 mstore(add(0x400, 0x44), address()) mstore(add(0x400, 0x64), 0x80)
                 if iszero(call(gas(), pair, 0, 0x400, 0x84, 0, 0)) { revert(0, 0) }
             }
-            // case 0x02 {
-            //     let token := shr(0x60, calldataload(0x01))
-            //     mstore()
-            // }
+            case 0x02 { revert(0, 0) } // Withdraw
             default {
                 revert(0, 0)
             }
