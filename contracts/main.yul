@@ -48,10 +48,9 @@ object "Contract" {
                 s := shr(0xf8, calldataload(0))
             }
             function decodeAsUint112(_pos) -> v { // max is 2^112-1; 14 bytes; allocated on demand w/o zeros
-                // 0x100-(dataSize-0x29)*8
                 v := shr(sub(0x100, mul(8, sub(calldatasize(), _pos))), calldataload(_pos))
             }
-                        // ↓ This sucks and should be deprecated
+            // ↓ This sucks and should be deprecated
             function getPair(token0, token1) -> p {
                 mstore(0, shl(0xe0, 0xe6a43905)) mstore(add(0, 0x04), token0) mstore(add(0, 0x24), token1)
                 if iszero(staticcall(gas(), 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f, 0, 0x44, 0x44, 0x20)) { revert(0, 0) }
@@ -68,18 +67,8 @@ object "Contract" {
                 r1 := mload(0x24)
             }
             /* ---------- Staging functions ---------- */
-            // getPair w/o direct call, using formula
             function getPairNew(token0, token1) -> p { revert(0, 0) } 
             function sortTokens(tokenA, tokenB) -> token0, token1 { revert(0, 0) }
-            //     if lt(tokenA, tokenB) {
-            //         token0 := tokenA
-            //         token1 := tokenB
-            //     }
-            //     if gt(tokenA, tokenB) {
-            //         token0 := tokenB
-            //         token1 := tokenA
-            //     }
-            // }
         }
     }
 }
